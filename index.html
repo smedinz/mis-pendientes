@@ -1,238 +1,246 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Mis Pendientes</title>
-  
-  <!-- Configuración PWA para iPhone -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Pendientes">
-  <link rel="apple-touch-icon" href="https://api.iconify.design/heroicons:check-badge-solid.svg?color=%231f4fd1&width=180">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
-  <style>
-    :root{
-      --bg:#eef1f5; --surface:#ffffff; --ink:#18202c; --muted:#5d6878; --line:#d5dbe4;
-      --accent:#1f4fd1; --accent-ink:#ffffff; --accent-soft:#e3eafc;
-      --hi:#d23a2f; --hi-soft:#fbe5e3; --mid:#b97700; --mid-soft:#fbf0d9; --lo:#3b8a63; --lo-soft:#e1f2e9;
-      --display:"Bricolage Grotesque",ui-rounded,system-ui,sans-serif;
-      --body:"Atkinson Hyperlegible",system-ui,-apple-system,sans-serif;
-      --r:14px;
-    }
-    @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-      --bg:#10141b; --surface:#1a2029; --ink:#e8edf4; --muted:#9aa5b5; --line:#2c3441;
-      --accent:#7c9dff; --accent-ink:#0d1220; --accent-soft:#1f2a46;
-      --hi:#ff7b70; --hi-soft:#3a1f1e; --mid:#f0b54a; --mid-soft:#352a14; --lo:#6fcf9c; --lo-soft:#173126; color-scheme:dark}}
-    :root[data-theme="dark"]{
-      --bg:#10141b; --surface:#1a2029; --ink:#e8edf4; --muted:#9aa5b5; --line:#2c3441;
-      --accent:#7c9dff; --accent-ink:#0d1220; --accent-soft:#1f2a46;
-      --hi:#ff7b70; --hi-soft:#3a1f1e; --mid:#f0b54a; --mid-soft:#352a14; --lo:#6fcf9c; --lo-soft:#173126; color-scheme:dark}
-    *{box-sizing:border-box}
-    body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;margin:0;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-    .wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
-    h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
-    header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
-    h1{font-size:30px;font-weight:700;letter-spacing:-.01em}
-    .date{color:var(--muted);font-size:14px}
-    .sync{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
-    .capture{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
-    .capture label{font-weight:700}
-    textarea{width:100%;min-height:84px;resize:vertical;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-    textarea:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    button{font:inherit;cursor:pointer;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;min-height:40px}
-    button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
-    button:disabled{opacity:.55;cursor:default}
-    .hint{color:var(--muted);font-size:14px}
-    .coach{background:var(--accent-soft);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
-    .coach h2{font-size:18px}
-    .stats{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:3px 10px;border-radius:999px;background:var(--surface);color:var(--ink);font-variant-numeric:tabular-nums}
-    .chip b{font-weight:700}
-    .coach-text{white-space:pre-wrap;max-width:65ch}
-    .tabs{display:none;gap:6px}
-    .tabs button{flex:1;border-radius:10px;font-weight:700}
-    .tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-    .board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
-    .col{display:flex;flex-direction:column;gap:10px;min-width:0}
-    .col>h2{font-size:17px;display:flex;justify-content:space-between;align-items:baseline;padding-inline:4px}
-    .col>h2 span{font-family:var(--body);font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
-    .topic{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;padding:6px 4px 0}
-    .card{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--u);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
-    .card[data-u="alta"]{--u:var(--hi);--us:var(--hi-soft)}
-    .card[data-u="media"]{--u:var(--mid);--us:var(--mid-soft)}
-    .card[data-u="baja"]{--u:var(--lo);--us:var(--lo-soft)}
-    .card.done .title{text-decoration:line-through;color:var(--muted)}
-    .title{font-weight:700;overflow-wrap:anywhere}
-    .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
-    .urg{border:none;background:var(--us);color:var(--u);font-weight:700;font-size:12px;padding:2px 10px;min-height:28px;text-transform:uppercase;letter-spacing:.05em}
-    .stale{color:var(--hi);font-weight:700}
-    .ex{font-size:11px;text-transform:uppercase;letter-spacing:.06em;border:1px dashed var(--line);border-radius:6px;padding:0 6px}
-    .actions{display:flex;gap:6px;flex-wrap:wrap}
-    .actions button{font-size:14px;min-height:34px;padding:4px 12px}
-    .empty{color:var(--muted);font-size:14px;border:1px dashed var(--line);border-radius:12px;padding:14px;text-align:center}
-    @media (max-width:720px){
-      .tabs{display:flex}
-      .board{grid-template-columns:minmax(0,1fr)}
-      .col{display:none}.col.active{display:flex}
-      .col>h2{display:none}
-    }
-    @media (prefers-reduced-motion:no-preference){.card{transition:transform .15s}.card:active{transform:scale(.99)}}
-  </style>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Mis Pendientes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 min-h-screen p-4 pb-24 font-sans">
+  <div class="max-w-md mx-auto space-y-4">
+    
+    <!-- Barra superior -->
+    <header class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+      <h1 class="text-lg font-bold text-slate-900">Mis Pendientes</h1>
+      <button onclick="toggleConfig()" class="text-xs text-blue-600 font-medium">Configurar API</button>
+    </header>
 
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Mis Pendientes</h1>
-      <div class="date" id="today"></div>
+    <!-- Modal / Desplegable de Configuración -->
+    <div id="config-box" class="hidden bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-2">
+      <label class="text-xs font-semibold text-slate-500 block">Gemini API Key:</label>
+      <input type="password" id="api-key" placeholder="Pega tu clave de Google AI Studio" 
+             class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <button onclick="saveApiKey()" class="w-full bg-slate-900 text-white text-xs font-semibold py-2 rounded-xl">Guardar clave</button>
     </div>
-    <div class="sync" id="sync">Guardado en este dispositivo</div>
-  </header>
 
-  <section class="capture" aria-label="Añadir pendientes">
-    <label for="input">¿Qué tienes pendiente?</label>
-    <textarea id="input" placeholder="Escríbelo como te salga. Ej: pagar la luz antes del viernes; revisar correos; comprar regalo"></textarea>
-    <div class="row">
-      <button class="primary" id="addPlain">Añadir pendientes</button>
-      <span class="hint" id="addMsg"></span>
+    <!-- Entrada de tareas -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+      <input type="text" id="task-input" placeholder="¿Qué tienes pendiente?" 
+             class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="addTask(false)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl transition">
+          Añadir sin IA
+        </button>
+        <button onclick="addTask(true)" id="btn-add-ai" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold py-2.5 px-3 rounded-xl transition">
+          ✨ Añadir con IA
+        </button>
+      </div>
     </div>
-  </section>
 
-  <section class="coach" aria-live="polite">
-    <h2>Cómo vas</h2>
-    <div class="stats" id="stats"></div>
-    <div class="coach-text" id="coachText"></div>
-  </section>
+    <!-- Botón Principal: Ordenar con IA -->
+    <button onclick="prioritizeTasks()" id="btn-sort" 
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3.5 rounded-2xl shadow-sm flex items-center justify-center gap-2 transition active:scale-95">
+      <span id="sort-label">⚡ Ordenar con IA</span>
+    </button>
 
-  <div class="tabs" role="tablist" id="tabs">
-    <button role="tab" data-col="todo" aria-selected="true">Por hacer</button>
-    <button role="tab" data-col="doing" aria-selected="false">En curso</button>
-    <button role="tab" data-col="done" aria-selected="false">Hecho</button>
+    <!-- Lista de Tareas -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+      <ul id="task-list" class="space-y-2"></ul>
+      <p id="empty-state" class="text-xs text-slate-400 text-center py-6">No hay tareas pendientes.</p>
+    </div>
+
+    <!-- Sección de comentarios / Feedback -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Análisis</span>
+        <button onclick="requestFeedback()" id="btn-feedback" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg transition">
+          Pedir comentario a la IA
+        </button>
+      </div>
+      <div id="ai-comment-box" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl min-h-[3.5rem] flex items-center justify-center border border-slate-100">
+        <span class="text-slate-400 italic">Toca el botón para analizar tu lista.</span>
+      </div>
+    </div>
+
   </div>
-  <main class="board" id="board"></main>
-</div>
 
-<script>
-const COLS=[["todo","Por hacer"],["doing","En curso"],["done","Hecho"]];
-const URG=["alta","media","baja"], URANK={alta:0,media:1,baja:2};
-const DAY=86400000;
-let tasks=[], active="todo", armedDelete=null;
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const todayStr=()=>new Date().toLocaleDateString("es-CL",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-const daysSince=t=>Math.floor((Date.now()-(t||Date.now()))/DAY);
+  <script>
+    let tasks = JSON.parse(localStorage.getItem('user_tasks') || '[]');
+    let apiKey = localStorage.getItem('gemini_api_key') || '';
 
-/* Persistencia en LocalStorage */
-const LS="mis-pendientes-v1";
-function lsLoad(){try{return JSON.parse(localStorage.getItem(LS)||"[]")}catch{return[]}}
-function lsSave(){try{localStorage.setItem(LS,JSON.stringify(tasks))}catch{}}
-tasks=lsLoad();
+    if (apiKey) document.getElementById('api-key').value = apiKey;
 
-function addTask(t){
-  const base={status:"todo",createdAt:Date.now(),movedAt:Date.now(),due:null,example:false,...t};
-  tasks.push({id:"l"+Date.now()+Math.random().toString(36).slice(2,6),...base});
-  lsSave();
-  render();
-}
-function patchTask(id,p){
-  Object.assign(tasks.find(x=>x.id===id)||{},p);
-  lsSave();
-  render();
-}
-function removeTask(id){
-  tasks=tasks.filter(x=>x.id!==id);
-  lsSave();
-  render();
-}
+    function saveApiKey() {
+      const val = document.getElementById('api-key').value.trim();
+      localStorage.setItem('gemini_api_key', val);
+      apiKey = val;
+      toggleConfig();
+      alert('Clave guardada.');
+    }
 
-function render(){
-  $("#today").textContent=todayStr();
-  const board=$("#board");
-  board.innerHTML=COLS.map(([k,label])=>{
-    const list=tasks.filter(t=>t.status===k);
-    const groups={};
-    list.forEach(t=>{(groups[t.topic||"General"]??=[]).push(t)});
-    const topics=Object.keys(groups).sort((a,b)=>{
-      const ua=Math.min(...groups[a].map(t=>URANK[t.urgency]??1)),ub=Math.min(...groups[b].map(t=>URANK[t.urgency]??1));
-      return ua-ub||a.localeCompare(b,"es")});
-    const body=topics.length?topics.map(tp=>`<div class="topic">${esc(tp)}</div>`+
-      groups[tp].sort((a,b)=>(URANK[a.urgency]??1)-(URANK[b.urgency]??1)||a.createdAt-b.createdAt).map(card).join("")).join("")
-      :`<div class="empty">${k==="todo"?"Nada pendiente. Escribe arriba lo que tengas en la cabeza.":k==="doing"?"Toca “Empezar” en una tarea para moverla aquí.":"Lo que termines aparecerá aquí."}</div>`;
-    return `<section class="col ${k===active?"active":""}" data-col="${k}"><h2>${label}<span>${list.length}</span></h2>${body}</section>`;
-  }).join("");
-  document.querySelectorAll("#tabs button").forEach(b=>{
-    const n=tasks.filter(t=>t.status===b.dataset.col).length;
-    b.textContent=COLS.find(c=>c[0]===b.dataset.col)[1]+" · "+n;
-    b.setAttribute("aria-selected",b.dataset.col===active)});
-  renderStats();
-}
+    function toggleConfig() {
+      document.getElementById('config-box').classList.toggle('hidden');
+    }
 
-function card(t){
-  const idle=daysSince(t.movedAt);
-  const stale=t.status!=="done"&&idle>=7;
-  const acts=t.status==="todo"?`<button data-act="move" data-to="doing">Empezar</button><button data-act="move" data-to="done">Ya está</button>`
-    :t.status==="doing"?`<button data-act="move" data-to="done">Terminar</button><button data-act="move" data-to="todo">Devolver</button>`
-    :`<button data-act="move" data-to="todo">Reabrir</button>`;
-  const del=`<button data-act="del">${armedDelete===t.id?"¿Borrar seguro?":"Borrar"}</button>`;
-  return `<article class="card ${t.status==="done"?"done":""}" data-id="${esc(t.id)}" data-u="${esc(t.urgency||"media")}">
-    <div class="title">${esc(t.title)}</div>
-    <div class="meta">
-      <button class="urg" data-act="urg" aria-label="Cambiar urgencia">${esc(t.urgency||"media")}</button>
-      ${t.due?`<span>Para: ${esc(t.due)}</span>`:""}
-      ${stale?`<span class="stale">${idle} días sin moverse</span>`:t.status!=="done"?`<span>hace ${idle===0?"hoy":idle===1?"1 día":idle+" días"}</span>`:""}
-      ${t.example?`<span class="ex">ejemplo</span>`:""}
-    </div>
-    <div class="actions">${acts}${del}</div>
-  </article>`;
-}
+    function renderTasks() {
+      const list = document.getElementById('task-list');
+      const empty = document.getElementById('empty-state');
+      list.innerHTML = '';
 
-function renderStats(){
-  const open=tasks.filter(t=>t.status!=="done");
-  const urgent=open.filter(t=>t.urgency==="alta").length;
-  const doing=tasks.filter(t=>t.status==="doing").length;
-  const stale=open.filter(t=>daysSince(t.movedAt)>=7).length;
-  const done=tasks.filter(t=>t.status==="done").length;
-  $("#stats").innerHTML=[
-    [urgent,"urgentes"],[open.length,"abiertas"],[doing,"en curso"],[stale,"estancadas"],[done,"hechas"]
-  ].map(([n,l])=>`<span class="chip"><b>${n}</b>${l}</span>`).join("");
+      if (tasks.length === 0) {
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
 
-  let msg;
-  if(!tasks.length) msg="Aún no hay pendientes. Escribe arriba lo que tengas que hacer.";
-  else if(!open.length) msg="¡Todo hecho! Gran trabajo.";
-  else{
-    const top=open.slice().sort((a,b)=>(URANK[a.urgency]??1)-(URANK[b.urgency]??1)||a.createdAt-b.createdAt)[0];
-    msg=`Prioridad sugerida: “${top.title}”.`+(stale?` Tienes ${stale} ${stale===1?"tarea parada":"tareas paradas"} hace más de una semana.`:"")+(doing>3?" Tienes varias cosas empezadas; intenta cerrar una antes de abrir otra.":"");
-  }
-  $("#coachText").textContent=msg;
-}
+      tasks.forEach((t, index) => {
+        const li = document.createElement('li');
+        li.className = 'p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-start justify-between gap-2';
 
-$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;active=b.dataset.col;render()});
-$("#board").addEventListener("click",e=>{
-  const b=e.target.closest("button[data-act]");if(!b)return;
-  const id=b.closest(".card").dataset.id, t=tasks.find(x=>x.id===id);if(!t)return;
-  if(b.dataset.act==="move"){armedDelete=null;patchTask(id,{status:b.dataset.to,movedAt:Date.now()})}
-  else if(b.dataset.act==="urg"){patchTask(id,{urgency:URG[(URG.indexOf(t.urgency)+1)%3]})}
-  else if(b.dataset.act==="del"){
-    if(armedDelete===id){armedDelete=null;removeTask(id)}
-    else{armedDelete=id;render()}
-  }
-});
+        let badge = '';
+        if (t.priority) {
+          const color = t.priority === 'Alta' ? 'bg-red-100 text-red-700' : (t.priority === 'Media' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-700');
+          badge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${color}">${t.priority}</span>`;
+        }
 
-$("#addPlain").addEventListener("click",()=>{
-  const lines=$("#input").value.split(/\n|;/).map(s=>s.trim()).filter(Boolean);
-  if(!lines.length){$("#addMsg").textContent="Escribe algo primero.";return}
-  for(const l of lines) addTask({title:l,topic:"General",urgency:"media"});
-  $("#input").value="";
-  $("#addMsg").textContent=`Añadido${lines.length>1?"s":""} ${lines.length}.`;
-  setTimeout(()=>{$("#addMsg").textContent=""},2500);
-});
+        li.innerHTML = `
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-slate-400">#${index + 1}</span>
+              <span class="text-sm font-medium text-slate-800">${t.text}</span>
+              ${badge}
+            </div>
+            ${t.tag ? `<p class="text-[11px] text-slate-500 mt-1">Categoría: ${t.tag}</p>` : ''}
+          </div>
+          <button onclick="deleteTask(${t.id})" class="text-slate-400 hover:text-red-500 text-sm px-1">✕</button>
+        `;
+        list.appendChild(li);
+      });
+    }
 
-render();
-</script>
+    function save() {
+      localStorage.setItem('user_tasks', JSON.stringify(tasks));
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      save();
+    }
+
+    async function addTask(useAI) {
+      const input = document.getElementById('task-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      if (!useAI) {
+        tasks.push({ id: Date.now(), text: text, priority: null, tag: null });
+        input.value = '';
+        save();
+        return;
+      }
+
+      if (!apiKey) return alert('Configura tu API Key primero.');
+
+      const btn = document.getElementById('btn-add-ai');
+      btn.disabled = true;
+      btn.innerText = 'Analizando...';
+
+      try {
+        const prompt = `Analiza este pendiente: "${text}". Responde SOLO un JSON: {"prioridad": "Alta"|"Media"|"Baja", "categoria": "palabra_corta"}`;
+        const res = await callGemini(prompt, true);
+        const data = JSON.parse(res);
+
+        tasks.push({
+          id: Date.now(),
+          text: text,
+          priority: data.prioridad,
+          tag: data.categoria
+        });
+
+        input.value = '';
+        save();
+      } catch (e) {
+        alert('Error IA: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '✨ Añadir con IA';
+      }
+    }
+
+    async function prioritizeTasks() {
+      if (!apiKey) return alert('Configura tu API Key primero.');
+      if (tasks.length < 2) return alert('Ingresa al menos 2 tareas para ordenar.');
+
+      const btn = document.getElementById('btn-sort');
+      const label = document.getElementById('sort-label');
+      btn.disabled = true;
+      label.innerText = 'Reordenando...';
+
+      try {
+        const listData = tasks.map(t => ({ id: t.id, texto: t.text }));
+        const prompt = `Ordena estas tareas por urgencia e impacto óptimo: ${JSON.stringify(listData)}. Responde SOLO un JSON: {"orden": [id1, id2, ...]}`;
+
+        const res = await callGemini(prompt, true);
+        const parsed = JSON.parse(res);
+
+        tasks.sort((a, b) => parsed.orden.indexOf(a.id) - parsed.orden.indexOf(b.id));
+        save();
+      } catch (e) {
+        alert('Error al ordenar: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        label.innerText = '⚡ Ordenar con IA';
+      }
+    }
+
+    async function requestFeedback() {
+      if (!apiKey) return alert('Configura tu API Key primero.');
+      if (tasks.length === 0) return alert('No hay tareas para analizar.');
+
+      const btn = document.getElementById('btn-feedback');
+      const box = document.getElementById('ai-comment-box');
+
+      btn.disabled = true;
+      btn.innerText = 'Pensando...';
+      box.innerHTML = '<span class="text-slate-400 italic">Generando análisis...</span>';
+
+      try {
+        const taskText = tasks.map((t, i) => `${i + 1}. ${t.text}`).join('\n');
+        const prompt = `Actúa como asesor de productividad. En máximo 3 líneas directas, dime cuál tarea abordar de inmediato y un consejo para terminar rápido:\n${taskText}`;
+
+        const comment = await callGemini(prompt, false);
+        box.innerHTML = `<p class="text-slate-700 leading-relaxed text-left w-full">${comment.replace(/\\n/g, '<br>')}</p>`;
+      } catch (e) {
+        box.innerHTML = `<span class="text-red-500">Error: ${e.message}</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Pedir comentario a la IA';
+      }
+    }
+
+    async function callGemini(prompt, isJson) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: isJson ? { response_mime_type: "application/json" } : {}
+      };
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    renderTasks();
+  </script>
 </body>
 </html>
